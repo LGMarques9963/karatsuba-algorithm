@@ -64,12 +64,16 @@ char *somaStr(char *strA, char *strB) {
             result[i] = '1';
             carry = '1';
         }else if(carry == '1' && res == '2') {
-            result[i] = '0';
+            result[i] = '1';
             carry = '1';
         } else if (carry == '1' && res == '0') {
             result[i] = '1';
             carry = '0';
         }
+    }
+    if (carry == '1') {
+        result = shiftRight(result, len, 1);
+        result[0] = '1';
     }
     return result;
 }
@@ -80,12 +84,9 @@ int main(int argc, char *argv[]){
     int len = strlen(strA);
     int len2 = strlen(strB);
     printf("String A: %s\n", strA);
-    char *temp = shiftLeft(strA, len, 1);
-    printf("String B: %s\n", strB);
-    char *temp2 = shiftRight(strB, len2, 1);
-    printf("Shifted string: %s\n", temp);
-    printf("Shifted string: %s\n", temp2);
+    printf("String B: %s\n", strB);;
     printf("Soma: %s\n", somaStr(strA, strB));
+    /** TO-DO: paramêtros 10110 e 1101101 quebraram o algoritmo da soma, preciso encontrar o problema e corrigir */
     return 0;
 
 }
