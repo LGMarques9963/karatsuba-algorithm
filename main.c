@@ -51,24 +51,34 @@ char *somaStr(char *strA, char *strB) {
     result = memset(result, '0', len);
     for (int i = len - 1; i >= 0; i--) {
         char res = soma(strA[i], strB[i]);
-        if (carry == '0' && res == '2') {
-            result[i] = '0';
-            carry = '1';
-        } else if (carry == '0' && res == '1') {
-            result[i] = '1';
-            carry = '0';
-        } else if (carry == '0' && res == '0') {
-            result[i] = '0';
-            carry = '0';
-        } else if(carry == '1' && res == '1'){
-            result[i] = '1';
-            carry = '1';
-        }else if(carry == '1' && res == '2') {
-            result[i] = '1';
-            carry = '1';
-        } else if (carry == '1' && res == '0') {
-            result[i] = '1';
-            carry = '0';
+        switch (res) {
+            case '0':
+                if (carry == '0') {
+                    result[i] = '0';
+                    carry = '0';
+                } else {
+                    result[i] = '1';
+                    carry = '0';
+                }
+                break;
+            case '1':
+                if (carry == '0') {
+                    result[i] = '1';
+                    carry = '0';
+                } else {
+                    result[i] = '0';
+                    carry = '1';
+                }
+                break;
+            case '2':
+                if (carry == '0') {
+                    result[i] = '0';
+                    carry = '1';
+                } else {
+                    result[i] = '1';
+                    carry = '1';
+                }
+                break;
         }
     }
     if (carry == '1') {
