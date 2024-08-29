@@ -147,8 +147,39 @@ char *subStr(char *strA, char *strB) {
     return result;
 }
 
-char karatsuba(char *strA, char *strB, int len) {
-    
+char *karatsuba(char *strA, char *strB, int len) {
+    if (len == 1) {
+        char *result = malloc(1);
+        return memset(result, mult(strA[0], strB[0]), 1);
+    }
+    int newLen = len / 2;
+    char *a1 = malloc(newLen);
+    char *a2 = malloc(newLen);
+    char *b1 = malloc(newLen);
+    char *b2 = malloc(newLen);
+    for (int i = 0; i < newLen; i++) {
+        a1[i] = strA[i];
+        a2[i] = strA[i + newLen];
+        b1[i] = strB[i];
+        b2[i] = strB[i + newLen];
+    }
+    char *a1b1 = karatsuba(a1, b1, newLen);
+    char *a2b2 = karatsuba(a2, b2, newLen);
+    char *a1a2 = somaStr(a1, a2);
+    char *b1b2 = somaStr(b1, b2);
+    char *s1 = karatsuba(a1a2, b1b2, newLen);
+    char *s2 = subStr(s1, a1b1);
+    char *p3 = subStr(s2, a2b2);
+
+    char *p1 = shiftLeft(a1b1, newLen, 2);
+    char *p2 = a2b2;
+    printf("P1: %s\n", p1);
+    printf("P2: %s\n", a2b2);
+    printf("P3: %s\n", p3);
+    char *result = somaStr(p1, p2);
+    result = somaStr(result, p3);
+    return result;
+
 
 }
 
@@ -166,7 +197,7 @@ int main(int argc, char *argv[]){
     }
     printf("String A: %s\n", strA);
     printf("String B: %s\n", strB);;
-    printf("Soma: %s\n", subStr(strA, strB));
+    printf("Soma: %s\n", karatsuba(strA, strB, len));
     /** TO-DO: paramêtros 10110 e 1101101 quebraram o algoritmo da soma, preciso encontrar o problema e corrigir */
     return 0;
 
