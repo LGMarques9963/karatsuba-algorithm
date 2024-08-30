@@ -150,10 +150,6 @@ char *subStr(char *strA, char *strB) {
 
 void particiona(char **str, char **x1, char **x2) {
     int len = strlen(*str);
-    if (len % 2 != 0) {
-        *str = shiftRight(*str, len, 1);
-        len += 1;
-    }
     int meio = len / 2;
     *x1 = malloc(meio + 1);
     *x2 = malloc(meio +  1); 
@@ -169,54 +165,43 @@ char *karatsuba(char *strA, char *strB, int *call) {
     *call += 1;
     char *tab = malloc(*call + 1);
     tab=memset(tab, '\t', *call);
-    printf("%sRecebido: A = %s, B = %s\n", tab, strA, strB);
+    // printf("%sRecebido: A = %s, B = %s\n", tab, strA, strB);
     if (lenA == 1 && lenB == 1) {
-        char *result = malloc(1);
+        char *result = malloc(2);
         result[0] = mult(strA[0], strB[0]);
+        result[1] = '\0';
+        // printf("%sResultado: %s\n", tab, result);
         return result;
     }
     if (lenA != lenB) {
         normalize(&strA, &strB);
+        lenA = strlen(strA);
+        lenB = strlen(strB);
     }
-    int len = strlen(strA);
-    char *a1 = malloc(len / 2 + 1);
-    char *a2 = malloc(len / 2 + 1);
-    char *b1 = malloc(len / 2 + 1);
-    char *b2 = malloc(len / 2 + 1);
+    if (lenA % 2 != 0) {
+        strA = shiftRight(strA, lenA, 1);
+        strB = shiftRight(strB, lenB, 1);
+        lenA += 1;
+        lenB += 1;
+    }
+    int meio = lenA / 2;
+    char *a1 = malloc(meio + 1);
+    char *a2 = malloc(meio + 1);
+    char *b1 = malloc(meio + 1);
+    char *b2 = malloc(meio + 1);
     particiona(&strA, &a1, &a2);
     particiona(&strB, &b1, &b2);
-    printf("%sa1: %s\n", tab, a1);
-    printf("%sa2: %s\n", tab, a2);
-    printf("%sb1: %s\n", tab, b1);
-    printf("%sb2: %s\n", tab, b2);
-    printf("%sChamando a1 * b1\n", tab);
     char *p1 = karatsuba(a1, b1, call);
-    printf("%sp1: %s\n", tab, p1);
-    printf("%sChamando a2 * b2\n", tab);
     char *p2 = karatsuba(a2, b2, call);
-    printf("%sp2: %s\n", tab, p2);
-    printf("%sChamando (a1 + a2) * (b1 + b2)\n", tab);
-    char *a1a2 = somaStr(a1, a2);
-    printf("%sa1a2: %s\n", tab, a1a2); // TO-DO: a1a2 está com problema (10110 e 1101101
-    char *b1b2 = somaStr(b1, b2);
-    printf("%sb1b2: %s\n", tab, b1b2);
-    char *p3 = karatsuba(a1a2, b1b2, call);
-    printf("%sp3: %s\n", tab, p3);
-    printf("%sCalculando p4\n", tab);
+    char *p3 = karatsuba(somaStr(a1, a2), somaStr(b1, b2), call);
     char *p4 = subStr(p3, somaStr(p1, p2));
-    printf("%sp4: %s\n", tab, p4);
-    char *result;
-    int m = floor(len / 2);
-    p1 = shiftLeft(p1, strlen(p1), 2*m);
-    printf("%sp1 shiftado: %s\n", tab, p1);
-    p4 = shiftLeft(p4, strlen(p4), m);
-    printf("%sp4 shiftado: %s\n", tab, p4);
-    result = somaStr(p1, p2);
-    printf("%sp1 + p2: %s\n", tab, result);
-    result = somaStr(result, p4);
-    printf("%sp1 + p2 + p4: %s\n", tab, result);
+    char *result = malloc(lenA + 1);
+    char *c1 = shiftLeft(p1, strlen(p1), 2*(lenA - meio));
+    char *c2 = shiftLeft(p4, strlen(p4), lenA - meio);
+    result = somaStr(c1, c2);
+    result = somaStr(result, p2);
+    // printf("%sResultado: %s\n", tab, result);
     return result;
-
 }
 
 int main(int argc, char *argv[]){
