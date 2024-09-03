@@ -52,7 +52,7 @@ char *somaStr(char *strA, char *strB) {
     char carry = '0';
     normalize(&strA, &strB);
     int len = strlen(strA);
-    char *result = malloc(len + 1);
+    char *result = malloc(len + 2);
     result = memset(result, '0', len);
     for (int i = len - 1; i >= 0; i--) {
         char res = soma(strA[i], strB[i]);
@@ -90,7 +90,7 @@ char *somaStr(char *strA, char *strB) {
         result = shiftRight(result, len, 1);
         result[0] = '1';
     }
-    result[strlen(result) + 1] = '\0';
+    // result[strlen(result) + 1] = '\0';
     return result;
 }
 
@@ -110,7 +110,7 @@ char *subStr(char *strA, char *strB) {
     char borrow = '0';
     normalize(&strA, &strB); // normaliza os tamanhos das strings (completando com zeros à esquerda)
     int len = strlen(strA);
-    char *result = malloc(len);
+    char *result = malloc(len + 2);
     result = memset(result, '0', len);
     for (int i = len - 1; i >= 0; i--) {
         char res = sub(strA[i], strB[i]);
@@ -144,63 +144,68 @@ char *subStr(char *strA, char *strB) {
                 break;
         }
     }
-    result[strlen(result) + 1] = '\0';
+    // result[strlen(result) + 1] = '\0';
     return result;
 }
 
 void particiona(char **str, char **x1, char **x2) {
     int len = strlen(*str);
-    int meio = len / 2;
-    *x1 = malloc(meio + 1);
-    *x2 = malloc(meio +  1); 
-    strncpy(*x1, *str, meio);
-    strncpy(*x2, *str + meio, meio);
-    (*x1)[meio] = '\0';
-    (*x2)[meio] = '\0';
+    int part = len / 2;
+
+    *x1 = malloc(len + 1);
+    *x2 = malloc(len + 1);
+
+    strncpy(*x1, *str, part);
+    strncpy(*x2, *str + part, len - part);
+    // (*x1)[part] = '\0';
+    // (*x2)[len - part] = '\0';
 }
 
 char *karatsuba(char *strA, char *strB, int *call) {
-    int lenA = strlen(strA);
-    int lenB = strlen(strB);
-    *call += 1;
-    char *tab = malloc(*call + 1);
-    tab=memset(tab, '\t', *call);
-    // printf("%sRecebido: A = %s, B = %s\n", tab, strA, strB);
-    if (lenA == 1 && lenB == 1) {
+    // printf("Chamada: %d\n", *call);
+    // *call += 1;
+    // printf("String A: %s\n", strA);
+    // printf("String B: %s\n", strB);
+    // casos base
+    if (strstr(strA, "1") == NULL || strstr(strB, "1") == NULL) {
+        return "0";
+    }
+    if (strcmp(strA,"1") == 0) {
+        // printf("Retorno: %s\n", strA);
+        return strB;
+    }
+    if (strcmp(strB, "1") == 0) {
+        return strA;
+    }
+    if (strlen(strA) == 1 && strlen(strB) == 1) {
         char *result = malloc(2);
         result[0] = mult(strA[0], strB[0]);
         result[1] = '\0';
-        // printf("%sResultado: %s\n", tab, result);
         return result;
     }
-    if (lenA != lenB) {
-        normalize(&strA, &strB);
-        lenA = strlen(strA);
-        lenB = strlen(strB);
-    }
-    if (lenA % 2 != 0) {
-        strA = shiftRight(strA, lenA, 1);
-        strB = shiftRight(strB, lenB, 1);
-        lenA += 1;
-        lenB += 1;
-    }
-    int meio = lenA / 2;
-    char *a1 = malloc(meio + 1);
-    char *a2 = malloc(meio + 1);
-    char *b1 = malloc(meio + 1);
-    char *b2 = malloc(meio + 1);
+    // normaliza os tamanhos das strings
+    normalize(&strA, &strB);
+
+    // particiona as strings
+    char *a1;
+    char *a2;
+    char *b1;
+    char *b2;
     particiona(&strA, &a1, &a2);
     particiona(&strB, &b1, &b2);
+    int lenA = strlen(strA);
+    int meio = lenA / 2;
+    // calcula os produtos
     char *p1 = karatsuba(a1, b1, call);
     char *p2 = karatsuba(a2, b2, call);
     char *p3 = karatsuba(somaStr(a1, a2), somaStr(b1, b2), call);
     char *p4 = subStr(p3, somaStr(p1, p2));
-    char *result = malloc(lenA + 1);
-    char *c1 = shiftLeft(p1, strlen(p1), 2*(lenA - meio));
-    char *c2 = shiftLeft(p4, strlen(p4), lenA - meio);
-    result = somaStr(c1, c2);
-    result = somaStr(result, p2);
-    // printf("%sResultado: %s\n", tab, result);
+    char *p1_shifted = shiftLeft(p1, strlen(p1), (lenA - meio) * 2);
+    char *p4_shifted = shiftLeft(p4, strlen(p4), lenA - meio);
+    char *result = malloc(2*lenA + 1);
+    result = somaStr(somaStr(p1_shifted, p2), p4_shifted);
+    // result[strlen(result) + 1] = '\0';
+
     return result;
 }
 
@@ -212,7 +217,8 @@ int main(int argc, char *argv[]){
     normalize(&strA, &strB);
     printf("String A: %s\n", strA);
     printf("String B: %s\n", strB);
-    printf("Soma: %s\n", karatsuba(strA, strB, &call));
+    printf("Resultado: %s\n", karatsuba(strA, strB, &call));
+    // printf("Resultado: %s\n", subStr(strA, strB));
     // char *a1;
     // char *a2;
     // particiona(&strA, &a1, &a2);
