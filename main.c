@@ -359,6 +359,26 @@ char *karatsuba(char *strA, char *strB) {
     return result; // retorna o resultado
 }
 
+void removeZeros(char **str) {
+    /**
+        Função que remove os zeros à esquerda de uma string
+        Input:
+            str: string passada por referência
+    */
+    int len = strlen(*str); // calcula o tamanho da string
+    int i = 0;
+    while ((*str)[i] == '0') {
+        i++; // encontra o primeiro caractere diferente de zero
+    }
+    if (i == len) {
+        i--; // se a string for inteiramente zero, volta uma posição
+    }
+    char *newStr = malloc(len - i + 1); // aloca espaço para a nova string
+    strncpy(newStr, *str + i, len - i); // copia a string original para a nova string a partir do primeiro caractere diferente de zero
+    newStr[len - i] = '\0'; // adiciona o caractere de fim de string
+    *str = newStr; // atualiza a string original
+}
+
 int main(int argc, char *argv[]){
 
     /**
@@ -381,7 +401,9 @@ int main(int argc, char *argv[]){
         Calcula a multiplicação pelo algoritmo de Karatsuba e print o resultado na tela.
         O código foi testado para números de até 10000 bits.
     */
-    printf("%s\n", karatsuba(strA, strB));
+    char *result = karatsuba(strA, strB);
+    removeZeros(&result);
+    printf("%s\n", result);
 
     /**
         Prints para debug
